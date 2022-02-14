@@ -1,31 +1,51 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { FlatList } from 'react-native';
-
+import storage from '@react-native-firebase/storage';
 import { Container, PhotoInfo } from './styles';
 import { Header } from '../../components/Header';
 import { Photo } from '../../components/Photo';
-import { File } from '../../components/File';
+import { File, FileProps } from '../../components/File';
 
-import { photosData } from '../../utils/photo.data';
 
 export function Receipts() {
+  const [photo, setPhoto] = useState<FileProps[]>([])
+  const [photoSelected, setPhotoSelected] = useState('')
+
+  useEffect(() => {
+    storage().ref('images').list().then((result) => {
+      const files: FileProps[] = [];
+      result.items.forEach(file => {
+        files.push({
+          name: file.name,
+          path: file.fullPath
+        })
+      })
+      setPhoto(files);
+    })
+  }, [])
+
+  async function handleShowImage(path: string) {
+    const urlImage = await storage().ref(path).getDownloadURL();
+    setPhotoSelected(urlImage);
+  }
+
   return (
     <Container>
       <Header title="Comprovantes" />
 
-      <Photo uri="" />
+      <Photo uri={photoSelected} />
 
       <PhotoInfo>
         Informações da foto
       </PhotoInfo>
 
       <FlatList
-        data={photosData}
+        data={photo}
         keyExtractor={item => item.name}
         renderItem={({ item }) => (
           <File
             data={item}
-            onShow={() => { }}
+            onShow={() => handleShowImage(item.path)}
             onDelete={() => { }}
           />
         )}
