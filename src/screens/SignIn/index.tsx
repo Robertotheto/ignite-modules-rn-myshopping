@@ -9,6 +9,8 @@ import { Alert } from 'react-native';
 export function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+
   async function handleAnonymous() {
     const { user } = await auth().signInAnonymously();
     console.log(user);
@@ -32,6 +34,10 @@ export function SignIn() {
         }
       })
   }
+  async function handleSignInWithEmailAndPassword() {
+    const { user } = await auth().signInWithEmailAndPassword(email, password);
+    console.log(user);
+  }
   return (
     <Container>
       <Title>MyShopping</Title>
@@ -49,7 +55,7 @@ export function SignIn() {
         onChangeText={setPassword}
       />
 
-      <Button title="Entrar" onPress={handleAnonymous} />
+      <Button title="Entrar" onPress={handleSignInWithEmailAndPassword} />
 
       <Account>
         <ButtonText title="Recuperar senha" onPress={() => { }} />
