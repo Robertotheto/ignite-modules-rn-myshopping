@@ -13,11 +13,23 @@ export function SignIn() {
     const { user } = await auth().signInAnonymously();
     console.log(user);
   }
-  async function handleCreateAccount() {
+  async function handleCreateUserAccount() {
     auth()
       .createUserWithEmailAndPassword(email, password)
       .then(() => {
-        Alert.alert('Usuário criado com sucesso!')
+        Alert.alert('Usuário criado com sucesso!');
+      })
+      .catch(err => {
+        console.log(err.code);
+        if (err.code === 'auth/email-already-in-use') {
+          return Alert.alert('Email não disponível. Escolha outro para cadastrar.')
+        }
+        if (err.code === 'auth/invalid-email') {
+          return Alert.alert('Email invalido.')
+        }
+        if (err.code === 'auth/weak-password') {
+          return Alert.alert('Senha deve ter no minimo 6 dígitos.')
+        }
       })
   }
   return (
@@ -41,7 +53,7 @@ export function SignIn() {
 
       <Account>
         <ButtonText title="Recuperar senha" onPress={() => { }} />
-        <ButtonText title="Criar minha conta" onPress={handleCreateAccount} />
+        <ButtonText title="Criar minha conta" onPress={handleCreateUserAccount} />
       </Account>
     </Container>
   );
